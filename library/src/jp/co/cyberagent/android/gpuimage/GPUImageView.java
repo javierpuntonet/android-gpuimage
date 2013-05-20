@@ -60,10 +60,21 @@ public class GPUImageView extends FrameLayout {
         mGPUImage = new GPUImage(getContext());
         mGPUImage.setGLSurfaceView(mGLSurfaceView);
     }
+    
+    @Override
+    public void requestLayout() {
+        super.requestLayout();
+    	if (mGLSurfaceView!=null)
+    		mGLSurfaceView.requestLayout();
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (mRatio != 0.0f) {
+        if (mForceSize != null) {
+            super.onMeasure(MeasureSpec.makeMeasureSpec(mForceSize.width, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(mForceSize.height, MeasureSpec.EXACTLY));
+            
+        } else if (mRatio != 0.0f) {
             int width = MeasureSpec.getSize(widthMeasureSpec);
             int height = MeasureSpec.getSize(heightMeasureSpec);
 
