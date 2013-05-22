@@ -34,7 +34,7 @@ public class GPUImageGaussianBlurFilter extends GPUImageTwoPassTextureSamplingFi
 					"		blurCoordinates[i] = inputTextureCoordinate.xy + blurStep;\n"+
 					"	}\n"+
 					"}\n";
-	
+
 	public static final String FRAGMENT_SHADER=
 			"uniform sampler2D inputImageTexture;\n"+
 					"\n"+
@@ -60,9 +60,9 @@ public class GPUImageGaussianBlurFilter extends GPUImageTwoPassTextureSamplingFi
 					"\n"+
 					"	gl_FragColor = vec4(sum,fragColor.a);\n"+
 					"}";			
-	
-	protected float blurSize=1f;
-	
+
+	private float blurSize=1f;
+
 	public GPUImageGaussianBlurFilter() 
 	{
 		this(1f);
@@ -72,6 +72,12 @@ public class GPUImageGaussianBlurFilter extends GPUImageTwoPassTextureSamplingFi
 	{
 		super(VERTEX_SHADER, FRAGMENT_SHADER,VERTEX_SHADER, FRAGMENT_SHADER);
 		this.blurSize=blurSize;
+	}
+	
+	public void setBlurSize(float blurSize)
+	{
+		this.blurSize = blurSize;
+		initTexelOffsets();
 	}
 
     @Override
