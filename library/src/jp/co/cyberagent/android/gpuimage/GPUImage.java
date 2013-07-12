@@ -249,21 +249,23 @@ public class GPUImage {
     public Bitmap getBitmapWithFilterApplied(final Bitmap bitmap) {
         if (mGlSurfaceView != null) {
             mRenderer.deleteImage();
-            final Semaphore lock = new Semaphore(0);
             mRenderer.runOnDraw(new Runnable() {
 
                 @Override
                 public void run() {
-                    mFilter.destroy();
-                    lock.release();
+                    synchronized(mFilter) {
+                        mFilter.destroy();
+                        mFilter.notify();
+                    }
                 }
             });
             requestRender();
-
-            try {
-                lock.acquire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            synchronized(mFilter) {
+                try {
+                    mFilter.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -489,7 +491,9 @@ public class GPUImage {
             }
 
             cursor.moveToFirst();
-            return cursor.getInt(0);
+            int orientation = cursor.getInt(0);
+            cursor.close();
+            return orientation;
         }
     }
 
@@ -556,6 +560,7 @@ public class GPUImage {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
+            mGPUImage.deleteImage();
             mGPUImage.setImage(bitmap);
         }
 
